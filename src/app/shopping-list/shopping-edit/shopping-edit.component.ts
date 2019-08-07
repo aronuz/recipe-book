@@ -16,7 +16,7 @@ export class ShoppingEditComponent implements OnInit, OnDestroy, DoCheck {
   @ViewChild('amountInput', {static: true}) amountInputRef: ElementRef;
   subscription: Subscription;
   editMode = false;
-  inputClean = true;
+  inputsClean = true;
   editedItemNumber: number;
   editedItem: Ingredient;
 
