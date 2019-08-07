@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, DoCheck, ViewChild, ElementRef } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
@@ -10,10 +10,13 @@ import { ShoppingListService } from '../shopping-list.service';
   templateUrl: './shopping-edit.component.html',
   styleUrls: ['./shopping-edit.component.css']
 })
-export class ShoppingEditComponent implements OnInit, OnDestroy {
+export class ShoppingEditComponent implements OnInit, OnDestroy, DoCheck {
   @ViewChild('f', {static: true}) slForm: NgForm;
+  @ViewChild('nameInput', {static: true}) nameInputRef: ElementRef;
+  @ViewChild('amountInput', {static: true}) amountInputRef: ElementRef;
   subscription: Subscription;
   editMode = false;
+  inputClean = true;
   editedItemNumber: number;
   editedItem: Ingredient;
 
@@ -33,15 +36,36 @@ export class ShoppingEditComponent implements OnInit, OnDestroy {
     );
   }
 
-  onAddItem(form: NgForm){
+  onSubmitItem(form: NgForm){
     const value = form.value;
 
     const newIngredient = new Ingredient(value.name, value.amount);
-    this.slService.addIngredient(newIngredient);
+
+    if(this.editMode){
+      this.slService.updateIngredient(this.editedItemNumber, newIngredient);
+    }else{
+      this.slService.addIngredient(newIngredient);
+    }    
+    this.editMode = false;
+    form.reset();
+  }
+
+  onClear(){
+    this.slForm.reset();
+    this.editMode = false;
+  }
+
+  onDelete(){
+    this.slService.deleteIngredient(this.editedItemNumber);
+    this.onClear();
   }
 
   ngOnDestroy(){
     this.subscription.unsubscribe();
+  }
+
+  ngDoCheck(){
+    this.inputsClean = this.nameInputRef.nativeElement.value == '' && this.amountInputRef.nativeElement.value == '';
   }
 
 }
