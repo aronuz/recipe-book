@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, DoCheck, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 
@@ -9,10 +9,11 @@ import { RecipeService } from '../recipe.service';
   templateUrl: './recipe-edit.component.html',
   styleUrls: ['./recipe-edit.component.css']
 })
-export class RecipeEditComponent implements OnInit {
+export class RecipeEditComponent implements OnInit, DoCheck {
   id: number;
   editMode = false;
   recipeForm: FormGroup;
+  hasInredients = false;
 
   constructor(private route: ActivatedRoute, private recipeService: RecipeService, 
     private router: Router) { }
@@ -58,6 +59,19 @@ export class RecipeEditComponent implements OnInit {
         ])
       })
     );
+  }
+
+  onDeleteIngredient(index: number = null ){
+    if(!index){
+      (<FormArray>this.recipeForm.get('ingredients')).clear();
+    }else{
+      (<FormArray>this.recipeForm.get('ingredients')).removeAt(index);
+    }
+  }
+
+  ngDoCheck(){
+    //need check ingredients input contents
+    this.hasInredients = this.recipeService.getRecipes() ? true: false;
   }
 
   onCancel(){
