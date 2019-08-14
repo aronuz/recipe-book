@@ -12,7 +12,7 @@ export class DataStorageService{
     storeRecipes(){
         const recipes = this.recipeService.getRecipes();
         //return this.http.post('https://') used to subscribe in caller (ie. with a spinner)
-        this.http.post('https://').subscribe(
+        this.http.post('https://', recipes).subscribe(
             response => {
                 console.log(response);
             }
@@ -25,13 +25,13 @@ export class DataStorageService{
                 return recipes.map(recipe => {
                     return{...recipe, ingredients: recipe.ingredients ? recipe.ingredients : []};
                 });
-            }).tap(recipes => {
+            }),tap(recipes => {
                 this.recipeService.setRecipes(recipes);
-            }
-        )
+            })
+        );
         // .subscribe(
         //     recipes => {
-        //         this.recipeService.setRecipes(recipes);
+        //         recipes ? this.recipeService.setRecipes(recipes): console.log('Database empty!');
         //     }
         // );
     }
